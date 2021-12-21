@@ -35,14 +35,30 @@ function move(e){
 function nearby() {
 
     console.log(obj);
+    // console.log(obj);
     var distance = Math.floor(Math.sqrt(Math.pow((obj["B"][0] - obj["A"][0]),2) + Math.pow((obj["B"][1] - obj["A"][1]),2) ))
 
     if (distance < 250) {
-        // console.log("Avatar nearby turn on mic and video");
-        window.alert("Avatar is nearby");
+    var cam= document.getElementById("cam")
+    var flag=false;
+    console.log(distance);
+    
+    if (flag===false && distance < 250) {
+        console.log("Avatar nearby turn on mic and video");
+        flag=true;
+        cam.style.display="flex";
+        cam.style.flexDirection="horizontal";
+        start();
+        console.log(flag)
+    }
+    else if (distance >= 250 || flag){
+        stop();
+        console.log("inside");
+        flag=false;
+        cam.style.display="none";
     }
 }
-
+}
 
 //keydown event calls move fn whenever arrow keys are pressed.
 document.onkeydown=move;
@@ -62,8 +78,8 @@ function loadCanvas(pic){
     var img2 = new Image(); 
     
     var player1=pic+'.png';
-    img1.src = player1;
-    img2.src = '8.png';
+    img2.src = player1;
+    img1.src = '8.png';
 
     //Creating new images
     img1.onload = () => { 
@@ -74,4 +90,27 @@ function loadCanvas(pic){
         ctx.drawImage(img2, x, y);        
         obj["B"] = [x,y];
     };
+}
+
+function stop() {
+    var stream = video.srcObject;
+    var tracks = stream.getTracks();
+    for (var i = 0; i < tracks.length; i++) {
+        var track = tracks[i];
+        track.stop();
+    }
+    video.srcObject = null;
+}
+
+function start() {
+    var video = document.getElementById('video'),
+        vendorUrl = window.URL || window.webkitURL;
+    if (navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                video.srcObject = stream;
+            }).catch(function (error) {
+                console.log("Something went wrong!");
+            });
+    }
 }
